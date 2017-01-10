@@ -9,13 +9,15 @@ import java.util.concurrent.TimeUnit;
 
 
 public class LogProcessor {
-	ExecutorService executor;
+	final ExecutorService executor;
 	String fileDir;
 	final File[] logFiles;
 	final String tmpDir;
+	IsCloseObj closeFlag;
 	
-	public LogProcessor(String dir, String tmpDir, int numThreads){
-		executor = Executors.newFixedThreadPool(numThreads);
+	public LogProcessor(ExecutorService executor, String dir, String tmpDir, IsCloseObj closeFlag){
+		this.executor = executor;
+		this.closeFlag = closeFlag;
 		//add separator if it is not there
 		if (!tmpDir.endsWith(File.separator)) {
 			tmpDir = tmpDir + File.separator;
@@ -58,7 +60,7 @@ public class LogProcessor {
 		//workers will check if corresponding results files exist
 		//if so it will do nothing
 		for(final File logFile : logFiles){
-			LogWorker worker = new LogWorker(logFile, tmpDir);
+			LogWorker worker = new LogWorker(logFile, tmpDir, closeFlag);
 			executor.execute(worker);
 		}
 		

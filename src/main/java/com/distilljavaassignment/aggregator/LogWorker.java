@@ -15,10 +15,12 @@ public class LogWorker implements Runnable{
 	final String tmpDir;
 	final File logFile;
 	final File tmpFile; //corresponding results file
+	final IsCloseObj closeFlag;
 	Map<String, Map<String, Integer>> hourDomainCount; //date : <domain : requestCount>
 	
-	public LogWorker(File logFile, String tmpDir){
-		hourDomainCount = new HashMap<>();
+	public LogWorker(File logFile, String tmpDir, IsCloseObj closeFlag){
+		this.hourDomainCount = new HashMap<>();
+		this.closeFlag = closeFlag;
 		this.logFile = logFile;
 		this.tmpDir = tmpDir;
 		String tmpFileName = tmpDir + logFile.getName() + ".tmp";
@@ -26,16 +28,17 @@ public class LogWorker implements Runnable{
 	}
 	
 	public void run(){
-		//first check if results exist
-		if(tmpFile.exists()){
-			return;
+		while(!closeFlag.isClose){
+			//first check if results exist
+			if(tmpFile.exists()){
+				return;
+			}
+			//else
+			//1. process log file
+			readLogFile(logFile, hourDomainCount);
+			//2. write results map to intermediate tmp file;
+			writeResult(tmpFile, hourDomainCount);
 		}
-		//else
-		//1. process log file
-		readLogFile(logFile, hourDomainCount);
-		//2. write results map to intermediate tmp file;
-		writeResult(tmpFile, hourDomainCount);
-		
 	}
 	
 	public void readLogFile(File f, Map<String, Map<String, Integer>> resMap){		
@@ -72,7 +75,8 @@ public class LogWorker implements Runnable{
                 Thread.sleep(100);
             }
            
-            reader.close();            
+            reader.close();
+                        
         } catch (IOException e) {  
             e.printStackTrace();  
         } catch (InterruptedException ie) {

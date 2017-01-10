@@ -31,6 +31,7 @@ public class LogReducer {
 	}
 	
 	public void reduce(){
+		//read all results files and update maps above
 		for(File f : resultFiles){
 			readResultFile(f);
 		}
