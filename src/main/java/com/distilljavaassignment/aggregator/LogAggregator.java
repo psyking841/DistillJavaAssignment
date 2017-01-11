@@ -12,7 +12,7 @@ class IsCloseObj {
 
 public class LogAggregator {
 	final static ExecutorService THREAD_POOL = Executors.newFixedThreadPool(3); //three threads
-	private static final IsCloseObj closeFlag = new IsCloseObj();
+	private final static IsCloseObj closeFlag = new IsCloseObj();
 	
 	public static void main(String[] args){
 		//String logDir ="/Users/SPan/Downloads/Data-Engineer-Exercise-Data/";				

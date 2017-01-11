@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
@@ -19,10 +18,11 @@ public class LogProcessor {
 		this.executor = executor;
 		this.closeFlag = closeFlag;
 		//add separator if it is not there
-		if (!tmpDir.endsWith(File.separator)) {
+		if (tmpDir!=null && !tmpDir.endsWith(File.separator)) {
 			tmpDir = tmpDir + File.separator;
 		}
-		if (!dir.endsWith(File.separator)) {
+		
+		if (dir!=null && !dir.endsWith(File.separator)) {
 			dir = dir + File.separator;
 		}
 		
@@ -30,7 +30,16 @@ public class LogProcessor {
 		this.tmpDir = tmpDir;
 	}
 	
+	/**
+	 * Get all files under a directory
+	 * @param dir
+	 * @return
+	 */
 	public File[] getFiles(String dir){
+		if(dir == null){
+			return null;
+		}
+		
 		final File seedsDir = new File(dir);
 		//we only want .tsv file
 		return seedsDir.listFiles(new FileFilter(){
@@ -41,6 +50,9 @@ public class LogProcessor {
 		});
 	}
 	
+	/**
+	 * The main workflow is here...
+	 */
 	public void rollup(){
 		//do nothing if there is no log file
 		if(logFiles == null || logFiles.length == 0){
@@ -82,6 +94,9 @@ public class LogProcessor {
 		LogReducer reducer = new LogReducer(tmpDir);
 		reducer.reduce();
 		
+		System.out.println("Clean up results files!");
+		deleteDirectory(tmpDir);
+		
 		//output results to stdout
 		System.out.println("Metrics Summary:");
 		for(Map.Entry<String, Integer> entry : reducer.domainCount.entrySet()){
@@ -90,5 +105,45 @@ public class LogProcessor {
 			System.out.println("Hourly average number of requests for domain: " + domain + " is " + reducer.domainAverage.get(domain));
 			System.out.println("Maximum number of requests for domain: " + domain + " is " + reducer.domainMax.get(domain));
 		}
+	}
+	
+	/**
+	 * Function to delete a file
+	 * @param filePath
+	 */
+	public void deleteFile(String filePath) {
+		File file = new File(filePath);
+		if (file.isFile() && file.exists()) {
+			file.delete();
+		}
+	}
+	
+	/**
+	 * Function that recursively delete files in a folder and sub-folders
+	 * @param dirPath
+	 */
+	public void deleteDirectory(String dirPath) {// delete dir and files under it
+		File dirFile = new File(dirPath);
+		
+		if (!dirPath.endsWith(File.separator)) {
+			dirPath = dirPath + File.separator;
+		}
+		
+		if (!dirFile.exists() || !dirFile.isDirectory()) {
+			return;
+		}
+		
+		File[] files = dirFile.listFiles();// get all files
+		for (int i = 0; i < files.length; i++) {
+			if (files[i].isFile()) {
+				deleteFile(files[i].getAbsolutePath());
+				System.out.println(files[i].getAbsolutePath() + " has been deleted");
+			} else {//recursively delete
+				deleteDirectory(files[i].getAbsolutePath());
+			}
+		}
+		
+		dirFile.delete();
+		System.out.println(dirFile.getAbsolutePath() + " has been deleted");
 	}
 }

@@ -14,22 +14,26 @@ Here is how the program meets the requirements:
 4. To smoothly close the program when receiving SIGTERM, sun.misc.signal package is used. A signal handler is created in a static block such that it will be initiated right before the program runs. Note that the THREAD_POOL variable (the implementation of ServiceExecutor Interface) is a public global variable, this allows the handler to access the pool when receiving the signal.
 5. A global variable "isClose" (which is a object to a self-defined boolean class) is defined to pass "stop" signal to threads in the pool. Upon receiving the signal, this flag will be set to false such that incomplete threads in the pool will not start once receiving the SIGTERM signal. The running threads in the pool, however, will not be affected by this flag so they will continue the aggregation.
 3, 4 and 5 together make the program meet requirement 3.
-6. Once the mappers have done the aggregation, they will save all intermediate results into temp files. The "Driver" class will then start the reducer to aggregate the intermediate results in the temp files. The reducer will generate the final results for display in stdout. This meets requirement 4.
+6. Once the mappers have done the aggregation, they will save all intermediate results into temp files. The "Driver" class will then start the reducer to aggregate the intermediate results in the temp files. The reducer will generate the final results for driver to display in stdout. This meets requirement 4.
+7. At the end of the program, the driver will delete the tmp folder indicating the whole process has been finished.
 
-The unittests are also provided for testing mappers and reducer code.
+The unittests are also provided for testing mappers and reducer's functionalities and file deletion.
 
 Usage:
-Build the project by command:
+
+Step 1: build the project by command:
+
 mvn package assembly:single
 
 The jar file will be built under target folder
-run the jar file with command to use the program:
 
-java -jar ./target/log-aggregator-0.0.1-SNAPSHOT-jar-with-dependencies.jar path-to-input-log-files-DIR path-to-tmp-files-DIR
+Step 2: run the jar file with command to use the program:
+
+java -jar path-to-jar-file path-to-input-log-files-DIR path-to-tmp-files-DIR
 
 Note,
 The user has to provide the path to input log files and the path to tmp files (both are directories).
 When recovering from previous aggregation, please use the same tmp files directory (the easiest way is to run the same command again). 
 
-example
+example command:
 java -jar ./target/log-aggregator-0.0.1-SNAPSHOT-jar-with-dependencies.jar /Users/SPan/Downloads/Data-Engineer-Exercise-Data/ /Users/SPan/Downloads/tmp/

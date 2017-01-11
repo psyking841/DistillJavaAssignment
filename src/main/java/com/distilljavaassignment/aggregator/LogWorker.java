@@ -16,7 +16,7 @@ public class LogWorker implements Runnable{
 	final File logFile;
 	final File tmpFile; //corresponding results file
 	final IsCloseObj closeFlag;
-	Map<String, Map<String, Integer>> hourDomainCount; //date : <domain : requestCount>
+	Map<String, Map<String, Integer>> hourDomainCount; //date : <domain : requestCount>, this map has the intermediate results
 	
 	public LogWorker(File logFile, String tmpDir, IsCloseObj closeFlag){
 		this.hourDomainCount = new HashMap<>();
@@ -74,14 +74,18 @@ public class LogWorker implements Runnable{
                 domainCount.put(domain, domainCount.get(domain)+1);
                 Thread.sleep(100);
             }
-           
-            reader.close();
                         
         } catch (IOException e) {  
             e.printStackTrace();  
         } catch (InterruptedException ie) {
 			ie.printStackTrace();
-		}		
+		} finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void writeResult(File file, Map<String, Map<String, Integer>> resMap){

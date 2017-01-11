@@ -43,8 +43,8 @@ public class UtilitiesTest {
 	@Test
 	public void testDeleteDir(){
 		String tmpDir = "src/test/resources/tmp/";
-		LogReducer reducer = new LogReducer(tmpDir);
-		reducer.deleteDirectory(tmpDir);
+		LogProcessor driver = new LogProcessor(null, null, tmpDir, null);
+		driver.deleteDirectory(tmpDir);
 		assertFalse(new File(tmpDir).exists());
 	}
 }

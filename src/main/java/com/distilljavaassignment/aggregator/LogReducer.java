@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LogReducer {
-	Map<String, Integer> domainCount;
-	Map<String, Map<String, Integer>> domainHourCount; //domain : <hour : count>
-	Map<String, Integer> domainMax;
-	Map<String, Double> domainAverage;
+	Map<String, Integer> domainCount; //domain and its requests count
+	Map<String, Map<String, Integer>> domainHourCount; //domain : <hour : count>, domain and its request count in different hours
+	Map<String, Integer> domainMax; //domain and its max count
+	Map<String, Double> domainAverage; //domain and its average count across hours
 	String tmpDir;
 	File[] resultFiles;
 	
@@ -50,40 +50,6 @@ public class LogReducer {
 		}
 		
 		System.out.println("Reducer Done!");
-		System.out.println("Clean up results files!");
-		deleteDirectory(tmpDir);
-	}
-	
-	public void deleteFile(String filePath) {
-		File file = new File(filePath);
-		if (file.isFile() && file.exists()) {
-			file.delete();
-		}
-	}
-	
-	public void deleteDirectory(String dirPath) {// delete dir and files under it
-		File dirFile = new File(dirPath);
-		
-		if (!dirPath.endsWith(File.separator)) {
-			dirPath = dirPath + File.separator;
-		}
-		
-		if (!dirFile.exists() || !dirFile.isDirectory()) {
-			return;
-		}
-		
-		File[] files = dirFile.listFiles();// get all files
-		for (int i = 0; i < files.length; i++) {
-			if (files[i].isFile()) {
-				deleteFile(files[i].getAbsolutePath());
-				System.out.println(files[i].getAbsolutePath() + " has been deleted");
-			} else {//recursively delete
-				deleteDirectory(files[i].getAbsolutePath());
-			}
-		}
-		
-		dirFile.delete();
-		System.out.println(dirFile.getAbsolutePath() + " has been deleted");
 	}
 	
 	private void readResultFile(File f){		
