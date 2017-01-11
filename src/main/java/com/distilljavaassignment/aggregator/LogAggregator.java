@@ -17,8 +17,8 @@ public class LogAggregator {
 	public static void main(String[] args){
 		//String logDir ="/Users/SPan/Downloads/Data-Engineer-Exercise-Data/";				
 		//String tmpDir ="/Users/SPan/Downloads/tmp/";
-		String logDir = args[1];
-		String tmpDir = args[2];
+		String logDir = args[0];
+		String tmpDir = args[1];
 		
 		LogProcessor processor = new LogProcessor(THREAD_POOL, logDir, tmpDir, closeFlag);
 		

@@ -72,6 +72,10 @@ public class LogProcessor {
 		}finally {
 			executor.shutdownNow();
 			System.out.println("Shutdown thread poll");
+			if(closeFlag.isClose){
+				System.out.println("Shutdown process");
+				return;
+			}
 		}
 		
 		//once finished, we reduce the results in the results files
